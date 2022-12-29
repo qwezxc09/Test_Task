@@ -175,9 +175,8 @@ namespace QuickPick.Core
         }
 
         #region not exposed methods
-        private void Animate(DependencyProperty property, double targetValue, int duration = 300)
+        private void Animate(DependencyProperty property, double targetValue, int duration = 1000)
         {
-            //make a smooth animation that starts and ends slowly
             var keyFramesAnimation = new DoubleAnimationUsingKeyFrames();
             keyFramesAnimation.Duration = TimeSpan.FromMilliseconds(duration);
             keyFramesAnimation.KeyFrames.Add(
@@ -187,7 +186,6 @@ namespace QuickPick.Core
                     new KeySpline(0.5, 0.0, 0.5, 1.0)
                     )
                 );
-
             BeginAnimation(property, keyFramesAnimation);
         }
 
