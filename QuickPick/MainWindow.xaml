@@ -33,13 +33,29 @@
                 <Button Background="DarkGray" Command="{Binding RemoveButtonCommand}" Margin="5,0,0,0" Height="30" Width="30" DockPanel.Dock="left">-</Button>
             </DockPanel>
 
-            <ScrollViewer x:Name="sv" Margin="0,10,0,0" DockPanel.Dock="Top" Height="90" Width="350" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer local1:ScrollViewerBehavior.AutoScroll="{Binding ScrollArgs, Mode=TwoWay}"
+                          x:Name="sv" Margin="0,10,0,0"
+                          DockPanel.Dock="Top" Height="90" Width="350" 
+                          VerticalScrollBarVisibility="Disabled"
+                          CanContentScroll="False" 
+                          HorizontalScrollBarVisibility="Auto">
+                <i:Interaction.Behaviors>
+                    <local1:SmoothScrollViewerBehavior/>
+                </i:Interaction.Behaviors>
                 <local1:ContextHolder>
                     <local1:ContextHolder.Commands>
                         <local1:CommandBinding RoutedCommand="{x:Static ApplicationCommands.Replace}"
                                       RelayCommand="{Binding ChangeColorCommand}"/>
                     </local1:ContextHolder.Commands>
                     <ItemsControl x:Name="bl" ItemsSource="{Binding ButtonList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="PreviewMouseDown">
+                                <i:InvokeCommandAction Command="{Binding PreviewMouseDownCommand}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="PreviewMouseUp">
+                                <i:InvokeCommandAction Command="{Binding PreviewMouseUpCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal"/>
@@ -52,7 +68,8 @@
                                             CommandParameter="{Binding}" Margin="5,0,0,0" 
                                             Background="{Binding BackgroundColor}" 
                                             Height="{Binding Height}" 
-                                            Width="{Binding Width}"/>
+                                            Width="{Binding Width}">
+                                </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

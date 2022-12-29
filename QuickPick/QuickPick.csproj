@@ -73,7 +73,12 @@
     <Compile Include="Core\ContextHolder.cs" />
     <Compile Include="Core\ObservableObject.cs" />
     <Compile Include="Core\RelayCommand.cs" />
+    <Compile Include="Core\ScrollInfoAdapter.cs" />
+    <Compile Include="Core\ScrollViewerBehavior.cs" />
+    <Compile Include="Core\SmoothScrollViewer.cs" />
+    <Compile Include="Core\SmoothScrollViewerBehavior.cs" />
     <Compile Include="Model\ButtonClass.cs" />
+    <Compile Include="Model\ScrollArgs.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

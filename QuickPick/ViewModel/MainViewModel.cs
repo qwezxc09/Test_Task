@@ -5,14 +5,24 @@ using System.Collections.ObjectModel;
 using System;
 using System.Linq;
 using System.Windows.Media;
+using System.Windows;
+using System.Windows.Input;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace QuickPick.ViewModel
 {
-    public class MainViewModel : QuickPick.Core.ObservableObject
+    public class MainViewModel : Core.ObservableObject
     {
         private Random r = new Random();
+        private Point previewPointer;
+        private Point currentPointer;
+        private DateTime previewTime;
+        private DateTime currentTime;
         public MainViewModel()
         {
+            ScrollArgs = new ScrollArgs();
             ButtonList = new ObservableCollection<ButtonTemplate>
             {
                 new ButtonTemplate(r),
@@ -33,24 +43,24 @@ namespace QuickPick.ViewModel
             };
         }
         #region Properties
+        private ScrollArgs _scrollArgs;
+        public ScrollArgs ScrollArgs
+        {
+            get => _scrollArgs;
+            set
+            {
+                _scrollArgs = value;
+                OnPropertyChanged("ScrollArgs");
+            }
+        }
         private ObservableCollection<ButtonTemplate> _buttonList;
         public ObservableCollection<ButtonTemplate> ButtonList
         {
-            get { return _buttonList; }
+            get => _buttonList;
             set
             {
                 _buttonList = value;
                 OnPropertyChanged("ButtonList");
-            }
-        }
-        private ButtonTemplate _selectedButton;
-        public ButtonTemplate SelectedButton
-        {
-            get { return _selectedButton; }
-            set
-            {
-                _selectedButton = value;
-                OnPropertyChanged("SelectedButton");
             }
         }
         #endregion
@@ -64,7 +74,7 @@ namespace QuickPick.ViewModel
             {
                 return _changeColorCommand ?? (_changeColorCommand = new RelayCommand((obj) =>
                 {
-                    if(obj != null)
+                    if (obj != null)
                     {
                         var selectedButton = obj as ButtonTemplate;
                         var r = new Random();
@@ -99,6 +109,62 @@ namespace QuickPick.ViewModel
             }
         }
 
+
+        private RelayCommand _previewMouseDownCommand;
+        public RelayCommand PreviewMouseDownCommand
+        {
+            get
+            {
+                return _previewMouseDownCommand ?? (_previewMouseDownCommand = new RelayCommand((obj) =>
+                {
+                    previewPointer = GetMousePos();
+                    previewTime = DateTime.Now;
+                }));
+            }
+        }
+        private RelayCommand _previewMouseUpCommand;
+        public RelayCommand PreviewMouseUpCommand
+        {
+            get
+            {
+                return _previewMouseUpCommand ?? (_previewMouseUpCommand = new RelayCommand((obj) =>
+                {
+                    ScrollButtons();
+                }));
+            }
+        }
+        #endregion
+
+        #region Functions
+        Point GetMousePos() => Mouse.GetPosition(Application.Current.MainWindow);
+        public void ScrollButtons()
+        {
+            currentPointer = GetMousePos();
+            if (previewPointer.X > currentPointer.X)
+            {
+                ScrollArgs = new ScrollArgs
+                {
+                    Direction = "right",
+                    Offset = previewPointer.X - currentPointer.X,
+                    Speed = CountSpeed(currentPointer, previewPointer)
+                };
+            }
+            else
+            {
+                ScrollArgs = new ScrollArgs
+                {
+                    Direction = "left",
+                    Offset = currentPointer.X - previewPointer.X,
+                    Speed = CountSpeed(previewPointer, currentPointer)
+                };
+            }
+        }
+        public int CountSpeed(Point startPoint, Point endPoint)
+        {
+            currentTime = DateTime.Now;
+            var speed = Convert.ToInt32((endPoint.X - startPoint.Y) / (currentTime - previewTime).TotalMilliseconds);
+            return speed;
+        }
         #endregion
     }
 }
